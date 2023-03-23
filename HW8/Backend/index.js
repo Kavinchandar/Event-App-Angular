@@ -324,6 +324,7 @@ app.get('/artistDetails', async(req,res) => {
                 }
                 if(artist.hasOwnProperty('followers') && artist.followers.hasOwnProperty('total')){
                     followers = artist.followers.total;
+                    followers = followers.toLocaleString("en-US");
                 }
                 if(artist.hasOwnProperty('popularity')){
                     popularity = artist.popularity;
