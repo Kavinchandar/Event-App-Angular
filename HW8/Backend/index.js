@@ -28,29 +28,11 @@ spotifyApi.clientCredentialsGrant().then(
 
 app = express();
 app.use(cors());
+
 app.get('/', (req, res) => {
     res.send('Im Alive');
 });
 
-app.get('/suggest',async(req, res) => {
-    console.log(req.query);
-    req = `https://app.ticketmaster.com/discovery/v2/suggest?apikey=${keys.ticketmaster_key}&keyword=${req.query.keyword}`;
-    response = await axios.get(req);
-    let dictionary = response.data;
-    Data = {};
-    suggestions = [];
-    if(dictionary.hasOwnProperty('_embedded') && dictionary._embedded.hasOwnProperty('attractions')){
-            for(let key in dictionary._embedded.attractions){
-                if(dictionary._embedded.attractions[key].hasOwnProperty('name')){
-                   suggestions.push(dictionary._embedded.attractions[key].name); 
-                }
-            }
-            Data = {
-                'suggestions': suggestions
-            }
-        }   
-    res.send(Data);
-});
 
 //converts location to Coordinates and then to geohash 
 async function geocoding(location) {
@@ -70,9 +52,10 @@ async function geocoding(location) {
         return 'Not a valid Address';
     }
 };
+
 // get all events
 app.get('/allEvents', async (req,res) => {
-    Data = {};
+    let Data = {};
     console.log(req.query);
     geoPoint = await geocoding(req.query.location);
     if(geoPoint === 'Not a valid Address'){
@@ -381,6 +364,25 @@ app.get('/albumDetails', async(req,res) => {
 });
 
 
+app.get('/suggest',async(req, res) => {
+    console.log(req.query);
+    req = `https://app.ticketmaster.com/discovery/v2/suggest?apikey=${keys.ticketmaster_key}&keyword=${req.query.keyword}`;
+    response = await axios.get(req);
+    let dictionary = response.data;
+    let Data_s = {};
+    suggestions = [];
+    if(dictionary.hasOwnProperty('_embedded') && dictionary._embedded.hasOwnProperty('attractions')){
+            for(let key in dictionary._embedded.attractions){
+                if(dictionary._embedded.attractions[key].hasOwnProperty('name')){
+                   suggestions.push(dictionary._embedded.attractions[key].name); 
+                }
+            }
+            Data_s = {
+                'suggestions': suggestions
+            }
+        }   
+    res.send(Data_s);
+});
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => console.log(`Server running on ${PORT}`));
